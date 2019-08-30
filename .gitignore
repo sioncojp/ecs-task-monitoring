@@ -1,0 +1,16 @@
+_vendor
+.vendor
+vendor
+_vendor-*
+*.pid
+bin/ecs-task-monitoring
+*.swp
+.DS_Store
+tmp/*
+bin/
+
+### Other ###
+.idea/
+
+### .gitkeep ###
+!.gitkeep
