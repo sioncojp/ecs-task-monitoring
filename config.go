@@ -31,6 +31,8 @@ var (
 
 	// DefaultTaskCount ... Default number of tasks that can move in parallel
 	DefaultParallelTaskCount int
+
+	CurrentTaskThresholdFailureCount = 0
 )
 
 // Logger ... Store logging

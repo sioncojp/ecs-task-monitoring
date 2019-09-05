@@ -1,7 +1,6 @@
 package ecstaskmonitoring
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -10,7 +9,6 @@ import (
 
 // NewTask ... initialize Task
 func (c *Cluster) NewTask(e *ecs.Task) (*Task, error) {
-	fmt.Println("new task")
 	return &Task{
 		Name:            strings.TrimPrefix(aws.StringValue(e.Group), "family:"),
 		IncomingWebhook: c.IncomingWebhook,
@@ -49,16 +47,22 @@ func (c *Cluster) NewTasks() ([]*Task, error) {
 						t.EcsDescribeTask = append(t.EcsDescribeTask, d)
 
 						result = append(result, t)
-
 					} else {
 						// If nothing is set, apply incoming webhook set to cluster
-						t, err := c.NewTask(d)
+						task, err := c.NewTask(d)
 						if err != nil {
 							return nil, err
 						}
-						result = append(result, t)
+						result = append(result, task)
 					}
 				}
+			} else {
+				// If nothing is set, apply incoming webhook set to cluster
+				t, err := c.NewTask(d)
+				if err != nil {
+					return nil, err
+				}
+				result = append(result, t)
 			}
 		}
 	}

@@ -12,6 +12,6 @@ RUN make build
 FROM alpine
 
 WORKDIR /app
-RUN mkdir toml
+RUN mkdir config
 COPY --from=build-env /src/bin/ecs-task-monitoring /app/
-ENTRYPOINT ./ecs-task-monitoring -d toml/ -i $Interval -p $DefaultParallelCount
+ENTRYPOINT ./ecs-task-monitoring -d config/ -i $Interval -p $DefaultParallelCount

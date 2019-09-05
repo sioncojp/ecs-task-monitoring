@@ -33,13 +33,15 @@ func (c *Cluster) Monitor(exitErrCh chan error) {
 func MonitorTaskThreshold(c Cluster, exitErrCh chan error, wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	if len(c.Tasks) > c.TaskThreshold {
-		a := c.NewSlackAttachmentMessage(strconv.Itoa(len(c.Tasks)), "")
-		if err := a.PostSlackMessage(c.IncomingWebhook); err != nil {
-			exitErrCh <- err
-			return
+	if len(c.Tasks) >= c.TaskThreshold {
+		if CurrentTaskThresholdFailureCount == 0 || (CurrentTaskThresholdFailureCount%c.FailureCount) == 0 {
+			a := c.NewSlackAttachmentMessage(strconv.Itoa(len(c.Tasks)), "")
+			a.PostSlackMessage(c.IncomingWebhook)
+			CurrentTaskThresholdFailureCount++
 		}
 	}
+	CurrentTaskThresholdFailureCount = 0
+	return
 }
 
 // MonitorTaskParallel ... Monitor if task is running in parallel
@@ -53,10 +55,7 @@ func MonitorTaskParallel(c Cluster, exitErrCh chan error, wg *sync.WaitGroup) {
 
 		if len(c.Tasks) > v.Count {
 			a := v.NewSlackAttachmentMessage(strconv.Itoa(len(c.Tasks)), c.AwsProfile)
-			if err := a.PostSlackMessage(v.IncomingWebhook); err != nil {
-				exitErrCh <- err
-				return
-			}
+			a.PostSlackMessage(v.IncomingWebhook)
 		}
 	}
 }

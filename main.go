@@ -66,6 +66,7 @@ func (c *Config) Start(ctx context.Context, exitErrCh chan error) {
 
 	for _, v := range c.Clusters {
 		var err error
+
 		if v.Client, err = v.NewClient(); err != nil {
 			exitErrCh <- fmt.Errorf("initialize ecs client error: %v", err)
 			return

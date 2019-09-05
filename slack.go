@@ -2,12 +2,11 @@ package ecstaskmonitoring
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 
+	"io/ioutil"
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -24,32 +23,27 @@ type Slack interface {
 }
 
 // PostSlackMessage ... Verify the revision number and notify the message
-func (a *Attachment) PostSlackMessage(incomingWebhook string) error {
+func (a *Attachment) PostSlackMessage(incomingWebhook string) {
 	s := SlackMessage{
 		Attachments: []*Attachment{a},
 	}
 
 	msg, _ := json.Marshal(s)
 
-	resp, _ := http.PostForm(
+	resp, err := http.PostForm(
 		incomingWebhook,
 		url.Values{"payload": {string(msg)}},
 	)
-
-	retry := 3
-	for retry > 0 {
-		if _, err := ioutil.ReadAll(resp.Body); err != nil {
-			log.sugar.Warnf("failed to post message to slack: monitor: %v", err)
-			retry--
-		}
+	if err != nil {
+		log.sugar.Warnf("cannot post slack: %v: url: %s", err, incomingWebhook)
+		return
 	}
+
 	defer resp.Body.Close()
-
-	if retry == 0 {
-		return errors.New("failed to post message to slack 3 retry")
+	if _, err := ioutil.ReadAll(resp.Body); err != nil {
+		log.sugar.Warnf("cannot post slack: %v", err)
+		return
 	}
-
-	return nil
 }
 
 // NewSlackAttachmentMessage ... Initialize attachment data of slack for failure messages for cluster
