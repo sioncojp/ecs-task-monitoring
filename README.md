@@ -1,9 +1,10 @@
 # ecs-task-monitoring
 
-![](docs/ecs-task-monitoring.png)
-
 1. Monitor the number of tasks in the cluster and notify with slack IncomingWebhook.
-2. Monitor tasks running in parallel.
+![](docs/ecs-task-monitoring01.png)
+
+2. Monitor tasks running in parallel. To notify every 60 minutes.
+![](docs/ecs-task-monitoring02.png)
 
 # Motivation
 

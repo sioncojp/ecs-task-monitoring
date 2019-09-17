@@ -7,19 +7,16 @@ import (
 	"net/url"
 
 	"io/ioutil"
-	"strings"
-
-	"github.com/aws/aws-sdk-go/aws"
 )
 
 // https://golang.org/doc/faq#guarantee_satisfies_interface
 var _ Slack = (*Cluster)(nil)
-var _ Slack = (*Task)(nil)
+var _ Slack = (*ParallelNotify)(nil)
 
 // Slack ... Slack operation.
 type Slack interface {
 	// NewSlackAttachmentMessage ... Generate a message to send to slack
-	NewSlackAttachmentMessage(message, awsProfile string) *Attachment
+	NewSlackAttachmentMessage(message string) *Attachment
 }
 
 // PostSlackMessage ... Verify the revision number and notify the message
@@ -46,8 +43,8 @@ func (a *Attachment) PostSlackMessage(incomingWebhook string) {
 	}
 }
 
-// NewSlackAttachmentMessage ... Initialize attachment data of slack for failure messages for cluster
-func (c *Cluster) NewSlackAttachmentMessage(message, _ string) *Attachment {
+// NewSlackAttachmentMessage ... Initialize attachment data of slack for cluster messages
+func (c *Cluster) NewSlackAttachmentMessage(message string) *Attachment {
 	return &Attachment{
 		Color:  ColorRED,
 		Title:  "ECS cluster task count threshold has been exceeded",
@@ -56,17 +53,12 @@ func (c *Cluster) NewSlackAttachmentMessage(message, _ string) *Attachment {
 	}
 }
 
-// NewSlackAttachmentMessage ... Initialize attachment data of slack for failure messages for task
-func (t *Task) NewSlackAttachmentMessage(message, awsProfile string) *Attachment {
-	// clusterArn is e.g. "arn:aws:ecs:ap-northeast-1:123456789:cluster/cron"
-	cluster := strings.SplitAfter(aws.StringValue(t.EcsDescribeTask[0].ClusterArn), "/")[1]
-	region := strings.Split(aws.StringValue(t.EcsDescribeTask[0].ClusterArn), ":")[3]
-
+// NewSlackAttachmentMessage ... Initialize attachment data of slack for Parallel messages
+func (p *ParallelNotify) NewSlackAttachmentMessage(_ string) *Attachment {
 	return &Attachment{
-		Color: ColorRED,
-		Title: "ECS task parallel",
-		Text: fmt.Sprintf("%s\n"+
-			"current: %s > threshold: %d", t.Name, message, t.Count),
-		Footer: fmt.Sprintf("%s: %s cluster: %s", awsProfile, cluster, region),
+		Color:  ColorRED,
+		Title:  "ECS Task Parallel",
+		Text:   fmt.Sprintf("```\n%s```", p.Message),
+		Footer: fmt.Sprintf("%s: %s cluster: %s", p.AwsProfile, p.ClusterName, p.AwsRegion),
 	}
 }

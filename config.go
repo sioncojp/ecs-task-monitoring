@@ -29,10 +29,20 @@ var (
 	// MonitorInterval ... Monitoring interval
 	MonitorInterval time.Duration
 
-	// DefaultTaskCount ... Default number of tasks that can move in parallel
+	// DefaultParallelTaskCount ... Default number of tasks that can move in parallel
 	DefaultParallelTaskCount int
 
+	// CurrentTaskThresholdFailureCount ... How many times the current task has counted a failure
 	CurrentTaskThresholdFailureCount = 0
+
+	// ParallelNotifyTime ... Store notification time
+	ParallelNotifyTime time.Time
+
+	// ParallelNotifyTimeInterval ... To notify every 60 minutes.
+	ParallelNotifyTimeInterval = 60
+
+	// Parallels ... Count tasks that run in parallel
+	Parallels []*Parallel
 )
 
 // Logger ... Store logging
@@ -60,11 +70,24 @@ type Cluster struct {
 
 // Task ... Store ecs task data
 type Task struct {
-	Name            string `toml:"name"`
-	IncomingWebhook string `toml:"incoming_webhook"`
-	Count           int    `toml:"count"`
-	EcsDescribeTask []*ecs.Task
+	Name             string `toml:"name"`
+	Count            int    `toml:"count"`
+	EcsDescribeTasks []*ecs.Task
 	Slack
+}
+
+// Parallel ... count up Parallel
+type Parallel struct {
+	Name  string
+	Count int
+}
+
+// ParallelNotify ... for slack message
+type ParallelNotify struct {
+	Message     string
+	ClusterName string
+	AwsProfile  string
+	AwsRegion   string
 }
 
 // Client ... Store ECS client with a session
@@ -87,16 +110,16 @@ type Attachment struct {
 
 // LoadToml ... Read the toml file in the directory
 func LoadToml(dir string) (*Config, error) {
-	// 末尾が / で終わってなければ追加
+	// Add if not ending in /
 	if string(dir[len(dir)-1]) != "/" {
 		dir = dir + "/"
 	}
 
-	// load config. ディレクトリ配下の設定ファイルを結合して読み込む
+	// load config. Combine and read the configuration files under the directory
 	files, _ := ioutil.ReadDir(dir)
 	openFiles := make([]io.Reader, len(files)*2)
 
-	// ファイル間の結合の際、改行を加える
+	// Add line breaks when joining files
 	for i := 0; i < len(files); i++ {
 		num := int(2 * float64(i))
 		if i == 0 {
@@ -125,10 +148,6 @@ func (c *Config) Validation() error {
 
 		if v.TaskThreshold == 0 {
 			return fmt.Errorf("%s: task_threshold is 0", invalidMessage)
-		}
-
-		if v.TaskThreshold == 0 {
-			return fmt.Errorf("%s: aws region is 0", invalidMessage)
 		}
 
 		if v.Name == "" {

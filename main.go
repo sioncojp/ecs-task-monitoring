@@ -64,6 +64,8 @@ func Run(interval int64, parallel int, dir string) int {
 func (c *Config) Start(ctx context.Context, exitErrCh chan error) {
 	cluster := make(chan *Cluster)
 
+	ParallelNotifyTime = time.Now()
+
 	for _, v := range c.Clusters {
 		var err error
 
