@@ -71,15 +71,15 @@ type Cluster struct {
 // Task ... Store ecs task data
 type Task struct {
 	Name             string `toml:"name"`
-	Count            int    `toml:"count"`
+	Times            int    `toml:"times"`
 	EcsDescribeTasks []*ecs.Task
 	Slack
 }
 
-// Parallel ... count up Parallel
+// Parallel ... increase Parallel times
 type Parallel struct {
 	Name  string
-	Count int
+	Times int
 }
 
 // ParallelNotify ... for slack message

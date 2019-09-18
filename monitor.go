@@ -53,12 +53,12 @@ func MonitorTaskParallel(c Cluster, wg *sync.WaitGroup) {
 
 	for _, v := range c.Tasks {
 		// if setting count 0, ignore check
-		if v.Count == 0 {
+		if v.Times == 0 {
 			continue
 		}
 
-		if len(v.EcsDescribeTasks) > v.Count {
-			CountUpParallels(v.Name)
+		if len(v.EcsDescribeTasks) > v.Times {
+			IncreaseTimesParallels(v.Name)
 		}
 	}
 
@@ -77,18 +77,18 @@ func MonitorTaskParallel(c Cluster, wg *sync.WaitGroup) {
 
 }
 
-// CountUpParallels ... count up Parallels variable.
-func CountUpParallels(taskName string) {
+// IncreaseTimesParallels ... Increase in number of times Parallels variable.
+func IncreaseTimesParallels(taskName string) {
 	for _, v := range Parallels {
 		if v.Name == taskName {
-			v.Count++
+			v.Times++
 			return
 		}
 	}
 	Parallels = append(Parallels, &Parallel{taskName, 1})
 }
 
-// ParallelsToParallelNotify ... Parallels struct To ParallelNotify
+// ParallelsToParallelNotify ... Parallels struct to ParallelNotify
 func ParallelsToParallelNotify(c Cluster) *ParallelNotify {
 	result := &ParallelNotify{
 		ClusterName: c.Name,
@@ -96,7 +96,7 @@ func ParallelsToParallelNotify(c Cluster) *ParallelNotify {
 		AwsRegion:   c.AwsRegion,
 	}
 	for _, v := range Parallels {
-		result.Message += fmt.Sprintf("%s: %d count\n", v.Name, v.Count)
+		result.Message += fmt.Sprintf("%s: %d times\n", v.Name, v.Times)
 	}
 
 	return result

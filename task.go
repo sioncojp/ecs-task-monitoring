@@ -11,7 +11,7 @@ import (
 func (c *Cluster) NewTask(e *ecs.Task) (*Task, error) {
 	return &Task{
 		Name:             strings.TrimPrefix(aws.StringValue(e.Group), "family:"),
-		Count:            DefaultParallelTaskCount,
+		Times:            DefaultParallelTaskCount,
 		EcsDescribeTasks: []*ecs.Task{e},
 	}, nil
 }
