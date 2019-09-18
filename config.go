@@ -38,7 +38,7 @@ var (
 	// ParallelNotifyTime ... Store notification time
 	ParallelNotifyTime time.Time
 
-	// ParallelNotifyInterval ... To parallel notify interval
+	// ParallelNotifyInterval ... To parallel notify interval. minutes
 	ParallelNotifyInterval int
 
 	// Parallels ... Count tasks that run in parallel
