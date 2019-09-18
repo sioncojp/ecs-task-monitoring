@@ -9,8 +9,8 @@ incoming_webhook = "https://hooks.slack.com/services/xxxxxx"
 ### 0 is ignore check
 [[cluster.task]]
 name = "hoge"
-count = 0
+times = 0
 
 [[cluster.task]]
 name = "fuga"
-count = 2
+times = 2
