@@ -38,8 +38,8 @@ var (
 	// ParallelNotifyTime ... Store notification time
 	ParallelNotifyTime time.Time
 
-	// ParallelNotifyTimeInterval ... To notify every 60 minutes.
-	ParallelNotifyTimeInterval = 60
+	// ParallelNotifyInterval ... To parallel notify interval
+	ParallelNotifyInterval int
 
 	// Parallels ... Count tasks that run in parallel
 	Parallels []*Parallel

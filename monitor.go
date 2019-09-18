@@ -63,7 +63,7 @@ func MonitorTaskParallel(c Cluster, wg *sync.WaitGroup) {
 	}
 
 	// Notify every 60 minutes
-	if time.Now().Sub(ParallelNotifyTime).Minutes() > float64(ParallelNotifyTimeInterval) {
+	if time.Now().Sub(ParallelNotifyTime).Minutes() >= float64(ParallelNotifyInterval) {
 		notify := ParallelsToParallelNotify(c)
 		if notify.Message != "" {
 			a := notify.NewSlackAttachmentMessage("")

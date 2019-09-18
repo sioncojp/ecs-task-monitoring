@@ -20,9 +20,10 @@ func init() {
 }
 
 // Run ... run ecs-update-notify
-func Run(interval int64, parallel int, dir string) int {
+func Run(interval int64, parallel, parallelNotifyInterval int, dir string) int {
 	MonitorInterval = time.Duration(interval)
 	DefaultParallelTaskCount = parallel
+	ParallelNotifyInterval = parallelNotifyInterval
 
 	ctx, cancel := context.WithCancel(context.Background())
 

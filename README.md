@@ -17,7 +17,7 @@ If task is run as cron in cloudwatch events, datadog cannot monitor whether it i
 ```shell
 $ make help
 $ make build
-$ ./bin/ecs-task-monitoring -d examples/ -i 3 -p 1
+$ ./bin/ecs-task-monitoring -d examples/ -i 3 -p 1 -n 15
 ```
 
 # License
