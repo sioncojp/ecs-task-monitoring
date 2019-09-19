@@ -39,6 +39,8 @@ func MonitorTaskThreshold(c Cluster, wg *sync.WaitGroup) {
 
 	if len(c.Tasks) > c.TaskThreshold {
 		if (CurrentTaskThresholdFailureCount - c.FailureCount) == 0 {
+			log.sugar.Info("detect %s cluster in %s task threshold: %d", c.Name, c.AwsProfile, len(c.Tasks))
+
 			a := c.NewSlackAttachmentMessage(strconv.Itoa(len(c.Tasks)))
 			a.PostSlackMessage(c.IncomingWebhook)
 			CurrentTaskThresholdFailureCount = 0
@@ -59,6 +61,11 @@ func MonitorTaskParallel(c Cluster, wg *sync.WaitGroup) {
 
 		if len(v.EcsDescribeTasks) > v.Times {
 			IncreaseTimesParallels(v.Name)
+
+			log.sugar.Infof("detect parallel: %s", v.Name)
+			for _, v := range v.EcsDescribeTasks {
+				log.sugar.Infof("createdAt: %d, stoppedAt: %d, taskArn: %s", *v.CreatedAt, *v.StoppedAt, *v.TaskArn)
+			}
 		}
 	}
 
